@@ -22,16 +22,18 @@ const WithoutCaching: NextPage<WithoutCachingProps> = ({
       </Head>
       <Navbar />
       <header>
-        <h1>Without Caching</h1>
+        <h1>Without Caching (preview)</h1>
       </header>
       <hr />
       <main>
-        <Image
-          src={imageUrl}
-          alt="product preview image"
-          width={1000}
-          height={671}
-        />
+        <figure>
+          <Image
+            src={imageUrl}
+            alt="product preview image"
+            height={2048}
+            width={1379}
+          />
+        </figure>
         <section>
           <h2>{title}</h2>
           <p>{description}</p>
@@ -43,8 +45,13 @@ const WithoutCaching: NextPage<WithoutCachingProps> = ({
 
 export const getServerSideProps: GetServerSideProps<
   WithoutCachingProps
-> = async () => {
-  const productEntryId = "N1PQRT8QuhDZfq3OX3WEa";
+> = async ({ res }) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-cache, no-store, max-age=0, must-revalidate"
+  );
+
+  const productEntryId = "70awRsQGJKLQigPIFrMlmk";
 
   const response = await fetchPreviewProductById(productEntryId);
   const {

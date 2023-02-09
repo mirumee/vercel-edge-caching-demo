@@ -17,6 +17,7 @@ body {
   justify-content: center;
 }
 
+
 header, main, section, img {
   margin: 1em 0;
 }
@@ -56,10 +57,38 @@ nav {
   padding: 1em;
   display: flex;
   justify-content: center;
-  gap: 1em;
+  gap: 2em;
 }
 
 header {
   padding: 1em;
   text-align: center;
+}
+
+figure {
+  max-width: 1000px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.link-group {
+  display: flex;
+  gap: 0.5em;
+}
+
+@media (max-width: 1000px) {
+  body {
+    padding: 0 1em;
+  }
+
+  nav {
+    gap: 1em;
+  }
+
+  .link-group {
+    gap: 0.3em;
+  }
 }

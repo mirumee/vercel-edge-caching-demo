@@ -27,7 +27,15 @@ const WithCaching: NextPage<WithCachingProps> = ({
       </header>
       <hr />
       <main>
-        <Image src={imageUrl} alt="product image" width={1000} height={671} />
+        <figure>
+          <Image
+            src={imageUrl}
+            height={2048}
+            width={1379}
+            alt="product image"
+            sizes="100vw"
+          />
+        </figure>
         <section>
           <h2>{title}</h2>
           <p>{description}</p>
@@ -37,12 +45,26 @@ const WithCaching: NextPage<WithCachingProps> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  WithCachingProps
-> = async () => {
+const waitForFewSeconds = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, 3000);
+  });
+};
+
+export const getServerSideProps: GetServerSideProps<WithCachingProps> = async ({
+  res,
+  query = {},
+}) => {
+  res.setHeader("Cache-Control", "public, maxage=10");
   const productEntryId = "70awRsQGJKLQigPIFrMlmk";
 
   const response = await fetchProductById(productEntryId);
+
+  if ("wait" in query) {
+    await waitForFewSeconds();
+  }
 
   const {
     title,

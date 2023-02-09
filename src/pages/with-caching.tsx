@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps<WithCachingProps> = async ({
   res,
   query = {},
 }) => {
-  res.setHeader("Cache-Control", "public, maxage=10");
+  res.setHeader("Cache-Control", "public, max-age=30");
   const productEntryId = "70awRsQGJKLQigPIFrMlmk";
 
   const response = await fetchProductById(productEntryId);

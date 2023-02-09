@@ -32,6 +32,7 @@ const WithoutCaching: NextPage<WithoutCachingProps> = ({
             alt="product preview image"
             height={2048}
             width={1379}
+            sizes="100vw"
           />
         </figure>
         <section>

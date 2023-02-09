@@ -1,12 +1,20 @@
 import { Navbar } from "@/components/Navbar";
 import { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
+import { fetchPreviewProductById } from "@/lib/contentfulAPI";
+import Image from "next/image";
 
 interface WithoutCachingProps {
-  test: string;
+  title: string;
+  imageUrl: string;
+  description: string;
 }
 
-const WithoutCaching: NextPage<WithoutCachingProps> = ({ test }) => {
+const WithoutCaching: NextPage<WithoutCachingProps> = ({
+  title,
+  description,
+  imageUrl,
+}) => {
   return (
     <>
       <Head>
@@ -16,7 +24,19 @@ const WithoutCaching: NextPage<WithoutCachingProps> = ({ test }) => {
       <header>
         <h1>Without Caching</h1>
       </header>
-      <main>{test}</main>
+      <hr />
+      <main>
+        <Image
+          src={imageUrl}
+          alt="product preview image"
+          width={1000}
+          height={671}
+        />
+        <section>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </section>
+      </main>
     </>
   );
 };
@@ -24,11 +44,16 @@ const WithoutCaching: NextPage<WithoutCachingProps> = ({ test }) => {
 export const getServerSideProps: GetServerSideProps<
   WithoutCachingProps
 > = async () => {
-  const data = {
-    test: "testtes",
-  };
+  const productEntryId = "N1PQRT8QuhDZfq3OX3WEa";
 
-  return { props: { ...data } };
+  const response = await fetchPreviewProductById(productEntryId);
+  const {
+    title,
+    productImage: { url: imageUrl },
+    description,
+  } = response;
+
+  return { props: { title, imageUrl, description } };
 };
 
 export default WithoutCaching;

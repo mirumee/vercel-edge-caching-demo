@@ -1,12 +1,21 @@
 import { Navbar } from "@/components/Navbar";
+
+import { fetchProductById } from "@/lib/contentfulAPI";
 import { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
+import Image from "next/image";
 
 interface WithCachingProps {
-  test: string;
+  title: string;
+  description: string;
+  imageUrl: string;
 }
 
-const WithCaching: NextPage<WithCachingProps> = ({ test }) => {
+const WithCaching: NextPage<WithCachingProps> = ({
+  title,
+  description,
+  imageUrl,
+}) => {
   return (
     <>
       <Head>
@@ -16,7 +25,14 @@ const WithCaching: NextPage<WithCachingProps> = ({ test }) => {
       <header>
         <h1>With Caching</h1>
       </header>
-      <main>{test}</main>
+      <hr />
+      <main>
+        <Image src={imageUrl} alt="product image" width={1000} height={671} />
+        <section>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </section>
+      </main>
     </>
   );
 };
@@ -24,11 +40,17 @@ const WithCaching: NextPage<WithCachingProps> = ({ test }) => {
 export const getServerSideProps: GetServerSideProps<
   WithCachingProps
 > = async () => {
-  const data = {
-    test: "123",
-  };
+  const productEntryId = "70awRsQGJKLQigPIFrMlmk";
 
-  return { props: { ...data } };
+  const response = await fetchProductById(productEntryId);
+
+  const {
+    title,
+    productImage: { url: imageUrl },
+    description,
+  } = response;
+
+  return { props: { title, imageUrl, description } };
 };
 
 export default WithCaching;

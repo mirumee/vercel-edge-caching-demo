@@ -24,7 +24,7 @@ header, main, section, img {
 
 section {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
   max-width: 1000px;
 }
@@ -53,6 +53,10 @@ a {
   padding: 0.5em;
 }
 
+a:hover {
+  background-color: rgb(211, 211, 211);
+}
+
 nav {
   padding: 1em;
   display: flex;
@@ -74,9 +78,8 @@ img {
   height: auto;
 }
 
-.link-group {
-  display: flex;
-  gap: 0.5em;
+input[type=button] {
+  padding: 0.5em;
 }
 
 @media (max-width: 1000px) {
@@ -93,6 +96,36 @@ img {
   }
 }
 
-input[type=button] {
-  padding: 0.5em;
+.link-group {
+  display: flex;
+  gap: 0.5em;
+}
+
+.product-links-container {
+  align-items: flex-start;;
+  gap: 0.5em;
+}
+
+.product-links-container a {
+  width: 100%;
+}
+
+.note {
+  position: absolute;
+  animation: blink-animation 1.5s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+
+.associated-product-details {
+  padding: 0.5em 0;
+}
+
+.associated-product-details p {
+    font-size: 18px;
 }

@@ -12,5 +12,5 @@ export const useIsLoggedIn = () => {
     setIsLoggedIn(isMockAuthorizationCookiePresent);
   }, []);
 
-  return [isLoggedIn, setIsLoggedIn] as const;
+  return isLoggedIn;
 };

@@ -1,16 +1,54 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
-import { Navbar } from "@/components/Navbar";
+import { GetServerSideProps } from "next";
+import { fetchAllProducts, ProductItem } from "@/lib/contentfulAPI";
+import { getOptionsFromContext, notFound } from "@/lib/ssrUtils";
+import Link from "next/link";
+import { paths } from "@/paths";
+import { LoginButton } from "@/components/LoginButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+interface HomeProps {
+  productItems: ProductItem[];
+}
+
+const Home: React.FC<HomeProps> = ({ productItems }) => {
   return (
     <>
       <Head>
         <title>Vercel Edge caching demo</title>
       </Head>
-      <Navbar />
+      <header>
+        <LoginButton />
+      </header>
+      <section className="product-links-container ">
+        <h2>Products</h2>
+        {productItems.map((product) => (
+          <Link key={product.slug} href={`${paths.product}/${product.slug}`}>
+            {product.title}
+          </Link>
+        ))}
+      </section>
     </>
   );
-}
+};
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (
+  context
+) => {
+  const { res } = context;
+  const { shouldUsePreviewApi } = getOptionsFromContext(context);
+
+  const productItems = await fetchAllProducts(shouldUsePreviewApi);
+
+  if (!productItems) {
+    return notFound();
+  }
+
+  res.setHeader("Cache-Control", "public, max-age=300");
+
+  return { props: { productItems } };
+};
+
+export default Home;

@@ -1,11 +1,7 @@
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { PropsWithChildren } from "react";
 
-interface NavbarLink {
-  href: string;
-}
-
-export const NavbarLink: React.FC<PropsWithChildren<NavbarLink>> = ({
+export const NavbarLink: React.FC<PropsWithChildren<LinkProps>> = ({
   href,
   children,
 }) => <Link href={href}>{children}</Link>;

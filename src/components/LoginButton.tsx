@@ -1,7 +1,9 @@
 import { useIsLoggedIn } from "@/hooks/login";
+import { useRouter } from "next/router";
 
 export const LoginButton: React.FC = ({}) => {
-  const [isLoggedIn, setIsLoggedIn] = useIsLoggedIn();
+  const isLoggedIn = useIsLoggedIn();
+  const { reload } = useRouter();
 
   const handleLogin = async () => {
     const response = await fetch("/api/login", {
@@ -11,7 +13,10 @@ export const LoginButton: React.FC = ({}) => {
     const body = await response.json();
     const isLoginSuccessful = body.login === "Successful";
 
-    setIsLoggedIn(isLoginSuccessful);
+    if (!isLoginSuccessful) {
+      // handle errors
+    }
+    reload();
   };
 
   const handleLogOut = async () => {
@@ -21,8 +26,11 @@ export const LoginButton: React.FC = ({}) => {
 
     const body = await response.json();
     const isLogOutSuccessful = body.logout === "Successful";
+    if (!isLogOutSuccessful) {
+      // handle errors
+    }
 
-    setIsLoggedIn(!isLogOutSuccessful);
+    reload();
   };
 
   const buttonText = isLoggedIn ? "Log out" : "Log in";

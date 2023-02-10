@@ -1,23 +1,32 @@
 import { paths } from "../paths";
 import { LoginButton } from "./LoginButton";
 import { NavbarLink } from "./NavbarLink";
+import { useRouter } from "next/router";
 
-export const Navbar: React.FC = () => (
-  <nav>
-    <NavbarLink href={paths.home}>Home</NavbarLink>
-    <div className="link-group">
-      <NavbarLink href={paths.withCaching}>Published</NavbarLink>
-      <NavbarLink href={`${paths.withCaching}?wait`}>
-        Published (wait 3 sec)
-      </NavbarLink>
-    </div>
-    <div className="link-group">
-      <NavbarLink href={`${paths.withCaching}?preview`}>Preview</NavbarLink>
-      <NavbarLink href={`${paths.withCaching}?preview&wait`}>
-        Preview (wait 3 sec)
-      </NavbarLink>
-    </div>
+export const Navbar: React.FC = () => {
+  const router = useRouter();
 
-    <LoginButton />
-  </nav>
-);
+  const { pathname, query } = router;
+
+  return (
+    <nav>
+      <NavbarLink href={paths.home}>Home</NavbarLink>
+      <div className="link-group">
+        <NavbarLink href={{ href: pathname, query: { slug: query.slug } }}>
+          Published
+        </NavbarLink>
+        <NavbarLink
+          href={{ href: pathname, query: { slug: query.slug, wait: "" } }}
+        >
+          Published (wait 3 sec)
+        </NavbarLink>
+      </div>
+      <NavbarLink
+        href={{ href: pathname, query: { slug: query.slug, preview: "" } }}
+      >
+        Preview
+      </NavbarLink>
+      <LoginButton />
+    </nav>
+  );
+};

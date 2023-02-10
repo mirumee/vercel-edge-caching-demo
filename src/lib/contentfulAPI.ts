@@ -2,9 +2,10 @@ import {
   CONTENTFUL_API_ACCESS_TOKEN,
   CONTENTFUL_PREVIEW_API_ACCESS_TOKEN,
   CONTENTFUL_SPACE,
+  SALEOR_API,
 } from "@/config";
 
-export const fetchGraphQL = async (query: string, preview = false) => {
+export const fetchFromContentful = async (query: string, preview = false) => {
   return fetch(
     `https://graphql.contentful.com/content/v1/spaces/${CONTENTFUL_SPACE}`,
     {
@@ -28,40 +29,83 @@ type Product = {
   productImage: {
     url: string;
   };
+  product: string | null;
 };
 
-export const fetchProductById = async (productId: string): Promise<Product> => {
+type FetchProductBySlug = (
+  slug: string,
+  isPreview?: boolean
+) => Promise<Product | undefined>;
+
+export const fetchProductBySlug: FetchProductBySlug = async (
+  slug,
+  isPreview?: boolean
+) => {
+  const previewArgument = isPreview ? "true" : "false";
+
   const query = `
     query {
-      product(id: "${productId}") {
-        productImage {
-          url
+      productCollection(where: { slug: "${slug}" }, limit: 1, preview: ${previewArgument}) {
+       items{
+          productImage {
+            url
+          }
+          title
+          description
+          product
         }
-        title
-        description
       }
     }
   `;
-  const response = await fetchGraphQL(query);
 
-  return response?.data?.product as Product;
+  const response = await fetchFromContentful(query, isPreview);
+
+  return response?.data?.productCollection?.items?.[0] as Product | undefined;
 };
 
-export const fetchPreviewProductById = async (
-  productId: string
-): Promise<Product> => {
+export type ProductItem = { slug: string; title: string };
+
+type FetchAllProducts = (
+  isPreview?: boolean
+) => Promise<ProductItem[] | undefined>;
+
+export const fetchAllProducts: FetchAllProducts = async (isPreview) => {
   const query = `
     query {
-      product(id: "${productId}", preview: true) {
-        productImage {
-          url
+      productCollection(order: sys_publishedAt_ASC) {
+        items {
+          slug
+          title
         }
-        title
-        description
       }
-    }
-  `;
-  const response = await fetchGraphQL(query, true);
+    }`;
 
-  return response?.data?.product as Product;
+  const response = await fetchFromContentful(query, isPreview);
+
+  return response?.data?.productCollection?.items as ProductItem[] | undefined;
+};
+
+export const fetchFromSaleor = async (query: string) => {
+  return await fetch(SALEOR_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  }).then((response) => response.json());
+};
+
+export const fetchProductNameFromSaleorBySku = async (sku: string) => {
+  const query = `
+    query {
+      productVariant(sku: "${sku}") {
+        product {
+          name
+        }
+      }
+    }`;
+
+  const response = await fetchFromSaleor(query);
+
+  return response?.data?.productVariant?.product?.name as string;
 };

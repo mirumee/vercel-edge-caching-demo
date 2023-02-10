@@ -1,4 +1,4 @@
 export const paths = {
   home: "/",
-  withCaching: "/product",
+  product: "/product",
 } as const;

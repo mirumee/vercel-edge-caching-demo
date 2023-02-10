@@ -5,16 +5,18 @@ import {
 } from "@/config";
 
 const logout: NextApiHandler = (req, res) => {
-  const expiresAttribute = "expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-  const expiredMockAuthorizationCookie = `${MOCK_AUTHORIZATION_COOKIE_NAME}=; path=/; ${expiresAttribute}`;
+  const maxAgeZeroAttribute = "Max-Age=0";
+  const expiredMockAuthorizationCookie = `${MOCK_AUTHORIZATION_COOKIE_NAME}=; path=/; SameSite=Strict; ${maxAgeZeroAttribute}`;
 
-  const expiredVercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=; path=/; ${expiresAttribute}`;
+  const expiredVercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=; path=/; SameSite=Strict; ${maxAgeZeroAttribute}`;
 
   res
     .setHeader("Set-Cookie", [
       expiredMockAuthorizationCookie,
       expiredVercelNoCacheCookie,
     ])
+    .setHeader("Access-Control-Expose-Headers", "Set-Cookie")
+    .setHeader("Cache-Control", "no-cache")
     .status(200)
     .json({ logout: "Successful" });
 };

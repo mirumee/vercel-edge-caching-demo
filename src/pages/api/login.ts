@@ -9,12 +9,14 @@ const login: NextApiHandler = (req, res) => {
 
   const mockAuthorizationCookie = `${MOCK_AUTHORIZATION_COOKIE_NAME}=1; path=/; ${
     isDevelopment ? "" : "Secure;"
-  }`;
+  } SameSite=Strict;`;
 
-  const vercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=1; path=/;`;
+  const vercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=1; path=/; SameSite=Strict;`;
 
   res
     .setHeader("Set-Cookie", [mockAuthorizationCookie, vercelNoCacheCookie])
+    .setHeader("Access-Control-Expose-Headers", "Set-Cookie")
+    .setHeader("Cache-Control", "no-cache")
     .status(200)
     .json({ login: "Successful" });
 };

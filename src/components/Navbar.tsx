@@ -4,9 +4,7 @@ import { NavbarLink } from "./NavbarLink";
 import { useRouter } from "next/router";
 
 export const Navbar: React.FC = () => {
-  const router = useRouter();
-
-  const { pathname, query } = router;
+  const { pathname, query } = useRouter();
 
   return (
     <nav>

@@ -12,7 +12,7 @@ import {
   redirectTo,
   notFound,
   getOptionsFromContext,
-  reformatSaleorVariantSku,
+  getSaleorProductWithContentfulSku,
 } from "@/lib/ssrUtils";
 
 interface ProductPageProps {
@@ -22,7 +22,6 @@ interface ProductPageProps {
   isPreview?: boolean;
   ssrDate: string;
   showPleaseLoginToPreview?: boolean;
-  saleorProductSku?: string | null;
   saleorProductName?: string | null;
 }
 
@@ -33,7 +32,6 @@ const ProductPage: NextPage<ProductPageProps> = ({
   isPreview,
   ssrDate,
   showPleaseLoginToPreview,
-  saleorProductSku,
   saleorProductName,
 }) => {
   const pageHeader = isPreview ? "Preview" : "Published";
@@ -65,7 +63,6 @@ const ProductPage: NextPage<ProductPageProps> = ({
         <section>
           <h2>{title}</h2>
           <div className="associated-product-details">
-            {saleorProductSku && <p>Saleor product SKU: {saleorProductSku}</p>}
             {saleorProductName && (
               <p>Saleor product name: {saleorProductName}</p>
             )}
@@ -87,17 +84,17 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
   const { res, params } = context;
 
+  const slug = params?.slug;
+
+  if (!slug) {
+    return redirectTo("/");
+  }
+
   const { isAuthorized, shouldUsePreviewApi, doesRequestPreview, hasToWait } =
     getOptionsFromContext(context);
 
   if (hasToWait) {
     await waitForFewSeconds();
-  }
-
-  const slug = params?.slug;
-
-  if (!slug) {
-    return redirectTo("/");
   }
 
   const contentfulProduct = await fetchProductBySlug(slug, shouldUsePreviewApi);
@@ -113,13 +110,9 @@ export const getServerSideProps: GetServerSideProps<
     product: productSku,
   } = contentfulProduct;
 
-  const transformedProductSku = productSku
-    ? reformatSaleorVariantSku(productSku)
-    : null;
-
-  const saleorProductName = transformedProductSku
-    ? await fetchProductNameFromSaleorBySku(transformedProductSku)
-    : null;
+  const saleorProductName = productSku
+    ? await getSaleorProductWithContentfulSku(productSku)
+    : "";
 
   res.setHeader("Cache-Control", "public, max-age=300");
 
@@ -132,7 +125,6 @@ export const getServerSideProps: GetServerSideProps<
       ssrDate: new Date().toISOString(),
       showPleaseLoginToPreview: doesRequestPreview && !isAuthorized,
       saleorProductName: saleorProductName,
-      saleorProductSku: transformedProductSku,
     },
   };
 };

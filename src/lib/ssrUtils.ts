@@ -1,6 +1,7 @@
 import { MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
 import { GetServerSidePropsContext, Redirect } from "next";
 import { RequestContext } from "next/dist/server/base-server";
+import { fetchProductNameFromSaleorBySku } from "./contentfulAPI";
 
 export const waitForFewSeconds = async () =>
   new Promise((resolve) => {
@@ -45,5 +46,21 @@ export const getOptionsFromContext = ({
   } as const;
 };
 
-export const reformatSaleorVariantSku = (variantSku: string) =>
+const reformatSaleorVariantSku = (variantSku: string) =>
   variantSku.replace("Variant SKU: ", "");
+
+export const getSaleorProductWithContentfulSku = async (
+  contentfulProductSku: string
+) => {
+  if (!contentfulProductSku.includes("Variant SKU")) {
+    return null;
+  }
+
+  const transformedProductSku = reformatSaleorVariantSku(contentfulProductSku);
+
+  const saleorProductName = await fetchProductNameFromSaleorBySku(
+    transformedProductSku
+  );
+
+  return saleorProductName;
+};

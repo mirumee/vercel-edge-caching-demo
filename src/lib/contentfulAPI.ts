@@ -70,9 +70,11 @@ type FetchAllProducts = (
 ) => Promise<ProductItem[] | undefined>;
 
 export const fetchAllProducts: FetchAllProducts = async (isPreview) => {
+  const previewArgument = isPreview ? "true" : "false";
+
   const query = `
     query {
-      productCollection(order: sys_publishedAt_ASC) {
+      productCollection(order: sys_publishedAt_ASC, preview: ${previewArgument}) {
         items {
           slug
           title

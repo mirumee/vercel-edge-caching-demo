@@ -8,6 +8,4 @@ interface NavbarLink {
 export const NavbarLink: React.FC<PropsWithChildren<NavbarLink>> = ({
   href,
   children,
-}) => {
-  return <Link href={href}>{children}</Link>;
-};
+}) => <Link href={href}>{children}</Link>;

@@ -1,21 +1,30 @@
 import { Navbar } from "@/components/Navbar";
 
-import { fetchProductById } from "@/lib/contentfulAPI";
+import { fetchPreviewProductById, fetchProductById } from "@/lib/contentfulAPI";
 import { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
+
+import { CONTENTFUL_ENTRY_ID } from "@/config";
 
 interface WithCachingProps {
   title: string;
   description: string;
   imageUrl: string;
+  isPreview?: boolean;
+  ssrDate: string;
 }
 
 const WithCaching: NextPage<WithCachingProps> = ({
   title,
   description,
   imageUrl,
+  isPreview,
+  ssrDate,
 }) => {
+  const pageHeader = isPreview ? "Preview" : "Published";
+
   return (
     <>
       <Head>
@@ -23,7 +32,8 @@ const WithCaching: NextPage<WithCachingProps> = ({
       </Head>
       <Navbar />
       <header>
-        <h1>With Caching</h1>
+        <h1>{pageHeader}</h1>
+        <small>SSR date - {ssrDate}</small>
       </header>
       <hr />
       <main>
@@ -45,26 +55,24 @@ const WithCaching: NextPage<WithCachingProps> = ({
   );
 };
 
-const waitForFewSeconds = async () => {
-  return new Promise((resolve) => {
+const waitForFewSeconds = async () =>
+  new Promise((resolve) => {
     setTimeout(() => {
       resolve(null);
     }, 3000);
   });
-};
 
 export const getServerSideProps: GetServerSideProps<WithCachingProps> = async ({
   res,
-  query = {},
+  query,
+  req,
 }) => {
-  res.setHeader("Cache-Control", "public, max-age=30");
-  const productEntryId = "70awRsQGJKLQigPIFrMlmk";
+  const isPreviewApi =
+    MOCK_AUTHORIZATION_COOKIE_NAME in req.cookies && "preview" in query;
 
-  const response = await fetchProductById(productEntryId);
+  const fetchMethod = isPreviewApi ? fetchPreviewProductById : fetchProductById;
 
-  if ("wait" in query) {
-    await waitForFewSeconds();
-  }
+  const response = await fetchMethod(CONTENTFUL_ENTRY_ID);
 
   const {
     title,
@@ -72,7 +80,21 @@ export const getServerSideProps: GetServerSideProps<WithCachingProps> = async ({
     description,
   } = response;
 
-  return { props: { title, imageUrl, description } };
+  if ("wait" in query) {
+    await waitForFewSeconds();
+  }
+
+  res.setHeader("Cache-Control", "public, max-age=300");
+
+  return {
+    props: {
+      title,
+      imageUrl,
+      description,
+      isPreview: isPreviewApi,
+      ssrDate: new Date().toISOString(),
+    },
+  };
 };
 
 export default WithCaching;

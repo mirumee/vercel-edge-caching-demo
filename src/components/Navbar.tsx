@@ -3,28 +3,20 @@ import { LoginButton } from "./LoginButton";
 import { NavbarLink } from "./NavbarLink";
 import { useRouter } from "next/router";
 
-export const Navbar: React.FC = () => {
-  const { pathname, query } = useRouter();
+interface NavbarProps {
+  showLoginToPreview?: boolean;
+}
 
+export const Navbar: React.FC<NavbarProps> = ({ showLoginToPreview }) => {
   return (
     <nav>
       <NavbarLink href={paths.home}>Home</NavbarLink>
-      <div className="link-group">
-        <NavbarLink href={{ href: pathname, query: { slug: query.slug } }}>
-          Published
-        </NavbarLink>
-        <NavbarLink
-          href={{ href: pathname, query: { slug: query.slug, wait: "" } }}
-        >
-          Published (wait 3 sec)
-        </NavbarLink>
+      <div className="nav-group">
+        {showLoginToPreview && (
+          <strong className="note">Log in to see preview content</strong>
+        )}
+        <LoginButton />
       </div>
-      <NavbarLink
-        href={{ href: pathname, query: { slug: query.slug, preview: "" } }}
-      >
-        Preview
-      </NavbarLink>
-      <LoginButton />
     </nav>
   );
 };

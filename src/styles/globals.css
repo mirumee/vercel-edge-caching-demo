@@ -96,9 +96,10 @@ input[type=button] {
   }
 }
 
-.link-group {
+.nav-group {
   display: flex;
   gap: 0.5em;
+  align-items: center;;
 }
 
 .product-links-container {
@@ -111,8 +112,8 @@ input[type=button] {
 }
 
 .note {
-  position: absolute;
   animation: blink-animation 1.5s steps(5, start) infinite;
+  display: inline-block;
 }
 
 @keyframes blink-animation {

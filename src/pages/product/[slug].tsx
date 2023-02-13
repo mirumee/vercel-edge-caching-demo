@@ -1,9 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 
-import {
-  fetchProductBySlug,
-  fetchProductNameFromSaleorBySku,
-} from "@/lib/contentfulAPI";
+import { fetchProductBySlug } from "@/lib/contentfulAPI";
 import { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -14,6 +11,7 @@ import {
   getOptionsFromContext,
   getSaleorProductWithContentfulSku,
 } from "@/lib/ssrUtils";
+import { paths } from "@/paths";
 
 interface ProductPageProps {
   title: string;
@@ -21,7 +19,7 @@ interface ProductPageProps {
   imageUrl: string;
   isPreview?: boolean;
   ssrDate: string;
-  showPleaseLoginToPreview?: boolean;
+  showLoginToPreview?: boolean;
   saleorProductName?: string | null;
 }
 
@@ -31,7 +29,7 @@ const ProductPage: NextPage<ProductPageProps> = ({
   imageUrl,
   isPreview,
   ssrDate,
-  showPleaseLoginToPreview,
+  showLoginToPreview,
   saleorProductName,
 }) => {
   const pageHeader = isPreview ? "Preview" : "Published";
@@ -41,10 +39,7 @@ const ProductPage: NextPage<ProductPageProps> = ({
       <Head>
         <title>Vercel Edge caching demo</title>
       </Head>
-      <Navbar />
-      {showPleaseLoginToPreview && (
-        <strong className="note">Please log in to see preview content</strong>
-      )}
+      <Navbar showLoginToPreview={showLoginToPreview} />
       <header>
         <h1>{pageHeader}</h1>
         <small>SSR date - {ssrDate}</small>
@@ -87,7 +82,7 @@ export const getServerSideProps: GetServerSideProps<
   const slug = params?.slug;
 
   if (!slug) {
-    return redirectTo("/");
+    return redirectTo(paths.home);
   }
 
   const { isAuthorized, shouldUsePreviewApi, doesRequestPreview, hasToWait } =
@@ -123,7 +118,7 @@ export const getServerSideProps: GetServerSideProps<
       description,
       isPreview: shouldUsePreviewApi,
       ssrDate: new Date().toISOString(),
-      showPleaseLoginToPreview: doesRequestPreview && !isAuthorized,
+      showLoginToPreview: doesRequestPreview && !isAuthorized,
       saleorProductName: saleorProductName,
     },
   };

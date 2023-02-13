@@ -1,7 +1,6 @@
 import { MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
 import { GetServerSidePropsContext, Redirect } from "next";
-import { RequestContext } from "next/dist/server/base-server";
-import { fetchProductNameFromSaleorBySku } from "./contentfulAPI";
+import { fetchProductNameFromSaleorBySku } from "./saleorApi";
 
 export const waitForFewSeconds = async () =>
   new Promise((resolve) => {

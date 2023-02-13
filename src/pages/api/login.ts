@@ -10,9 +10,9 @@ const login: NextApiHandler = (req, res) => {
   const maxAge = "Max-Age=3600;";
   const secure = isDevelopment ? "" : "Secure;";
 
-  const mockAuthorizationCookie = `${MOCK_AUTHORIZATION_COOKIE_NAME}=1; path=/; ${secure} ${maxAge} SameSite=Strict;`;
+  const mockAuthorizationCookie = `${MOCK_AUTHORIZATION_COOKIE_NAME}=1; path=/; ${secure} ${maxAge} SameSite=Lax;`;
 
-  const vercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=1; path=/; ${secure} ${maxAge} SameSite=Strict;`;
+  const vercelNoCacheCookie = `${VERCEL_NO_CACHE_COOKIE_NAME}=1; path=/; ${secure} ${maxAge} SameSite=Lax;`;
 
   res
     .setHeader("Set-Cookie", [mockAuthorizationCookie, vercelNoCacheCookie])

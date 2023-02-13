@@ -34,6 +34,8 @@ const ProductPage: NextPage<ProductPageProps> = ({
 }) => {
   const pageHeader = isPreview ? "Preview" : "Published";
 
+  const hasAssociatedSaleorProduct = saleorProductName;
+
   return (
     <>
       <Head>
@@ -57,11 +59,13 @@ const ProductPage: NextPage<ProductPageProps> = ({
         </figure>
         <section>
           <h2>{title}</h2>
-          <div className="associated-product-details">
-            {saleorProductName && (
-              <p>Saleor product name: {saleorProductName}</p>
-            )}
-          </div>
+          {hasAssociatedSaleorProduct && (
+            <div className="associated-product-details">
+              {saleorProductName && (
+                <p>Saleor product name: {saleorProductName}</p>
+              )}
+            </div>
+          )}
           <p>{description}</p>
         </section>
       </main>
@@ -107,7 +111,7 @@ export const getServerSideProps: GetServerSideProps<
 
   const saleorProductName = productSku
     ? await getSaleorProductWithContentfulSku(productSku)
-    : "";
+    : null;
 
   res.setHeader("Cache-Control", "public, max-age=300");
 

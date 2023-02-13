@@ -1,6 +1,9 @@
 import { MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
 import { GetServerSidePropsContext, Redirect } from "next";
-import { fetchProductNameFromSaleorBySku } from "./saleorApi";
+import { fetchProductById, fetchProductBySku } from "./saleorApi";
+
+const SALEOR_VARIANT_SKU_PREFIX = "Variant SKU: ";
+const SALEOR_PRODUCT_ID_PREFIX = "Product ID: ";
 
 export const waitForFewSeconds = async () =>
   new Promise((resolve) => {
@@ -46,20 +49,54 @@ export const getOptionsFromContext = ({
 };
 
 const reformatSaleorVariantSku = (variantSku: string) =>
-  variantSku.replace("Variant SKU: ", "");
+  variantSku.replace(SALEOR_VARIANT_SKU_PREFIX, "");
 
-export const getSaleorProductWithContentfulSku = async (
-  contentfulProductSku: string
-) => {
-  if (!contentfulProductSku.includes("Variant SKU")) {
-    return null;
-  }
+const reformatSaleorProductId = (productId: string) =>
+  productId.replace(SALEOR_PRODUCT_ID_PREFIX, "");
 
-  const transformedProductSku = reformatSaleorVariantSku(contentfulProductSku);
+const isProductId = (contentfulProductField: string) =>
+  contentfulProductField.includes(SALEOR_PRODUCT_ID_PREFIX);
 
-  const saleorProductName = await fetchProductNameFromSaleorBySku(
-    transformedProductSku
-  );
+const isVariantSku = (contentfulProductField: string) =>
+  contentfulProductField.includes(SALEOR_VARIANT_SKU_PREFIX);
 
-  return saleorProductName;
+type AssociatedSaleorProduct = {
+  name: string;
+  imageUrl?: string;
 };
+
+type GetSaleorProduct = (
+  contentfulProductField: string
+) => Promise<AssociatedSaleorProduct | null>;
+
+export const getSaleorProductWithContentfulProductField: GetSaleorProduct =
+  async (contentfulProductField) => {
+    if (isVariantSku(contentfulProductField)) {
+      const productSku = reformatSaleorVariantSku(contentfulProductField);
+      const saleorProduct = await fetchProductBySku(productSku);
+      if (!saleorProduct) {
+        return null;
+      }
+
+      const { name, media } = saleorProduct;
+      const imageUrl = media?.[0]?.url;
+
+      return { name, imageUrl };
+    }
+
+    if (isProductId(contentfulProductField)) {
+      const productId = reformatSaleorProductId(contentfulProductField);
+      const saleorProduct = await fetchProductById(productId);
+
+      if (!saleorProduct) {
+        return null;
+      }
+
+      const { name, media } = saleorProduct;
+      const imageUrl = media?.[0]?.url;
+
+      return { name, imageUrl };
+    }
+
+    return null;
+  };

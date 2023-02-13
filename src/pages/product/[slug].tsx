@@ -9,7 +9,7 @@ import {
   redirectTo,
   notFound,
   getOptionsFromContext,
-  getSaleorProductWithContentfulSku,
+  getSaleorProductWithContentfulProductField,
 } from "@/lib/ssrUtils";
 import { paths } from "@/paths";
 
@@ -20,7 +20,6 @@ interface ProductPageProps {
   isPreview?: boolean;
   ssrDate: string;
   showLoginToPreview?: boolean;
-  saleorProductName?: string | null;
 }
 
 const ProductPage: NextPage<ProductPageProps> = ({
@@ -30,11 +29,8 @@ const ProductPage: NextPage<ProductPageProps> = ({
   isPreview,
   ssrDate,
   showLoginToPreview,
-  saleorProductName,
 }) => {
   const pageHeader = isPreview ? "Preview" : "Published";
-
-  const hasAssociatedSaleorProduct = saleorProductName;
 
   return (
     <>
@@ -59,13 +55,6 @@ const ProductPage: NextPage<ProductPageProps> = ({
         </figure>
         <section>
           <h2>{title}</h2>
-          {hasAssociatedSaleorProduct && (
-            <div className="associated-product-details">
-              {saleorProductName && (
-                <p>Saleor product name: {saleorProductName}</p>
-              )}
-            </div>
-          )}
           <p>{description}</p>
         </section>
       </main>
@@ -106,24 +95,26 @@ export const getServerSideProps: GetServerSideProps<
     title,
     productImage: { url: imageUrl },
     description,
-    product: productSku,
+    product,
   } = contentfulProduct;
 
-  const saleorProductName = productSku
-    ? await getSaleorProductWithContentfulSku(productSku)
+  const associatedSaleorProduct = product
+    ? await getSaleorProductWithContentfulProductField(product)
     : null;
+
+  const productTitle = associatedSaleorProduct?.name || title;
+  const productImageUrl = associatedSaleorProduct?.imageUrl || imageUrl;
 
   res.setHeader("Cache-Control", "public, max-age=300");
 
   return {
     props: {
-      title,
-      imageUrl,
+      title: productTitle,
+      imageUrl: productImageUrl,
       description,
       isPreview: shouldUsePreviewApi,
       ssrDate: new Date().toISOString(),
       showLoginToPreview: doesRequestPreview && !isAuthorized,
-      saleorProductName: saleorProductName,
     },
   };
 };

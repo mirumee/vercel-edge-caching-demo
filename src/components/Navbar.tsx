@@ -1,7 +1,6 @@
 import { paths } from "../paths";
 import { LoginButton } from "./LoginButton";
 import { NavbarLink } from "./NavbarLink";
-import { useRouter } from "next/router";
 
 interface NavbarProps {
   showLoginToPreview?: boolean;

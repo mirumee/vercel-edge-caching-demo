@@ -105,6 +105,6 @@ export const getSaleorProductWithContentfulProductField: GetSaleorProduct =
 
 export const isPreviewAllowed = () => IS_PREVIEW;
 
-export const getCacheControlValue = (noCache = false) => {
-  return noCache ? "public, max-age=300" : "no-store";
+export const getCacheControlValue = (noStore = false) => {
+  return noStore ? "no-store" : "public, max-age=300";
 };

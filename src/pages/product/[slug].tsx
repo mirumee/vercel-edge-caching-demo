@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps<
     return redirectTo(paths.home);
   }
 
-  const { isAuthorized, shouldUsePreviewApi, doesRequestPreview, hasToWait } =
+  const { isAuthorized, hasToWait, shouldUsePreviewApi, isPreviewEnabled } =
     getOptionsFromContext(context);
 
   if (hasToWait) {
@@ -114,7 +114,7 @@ export const getServerSideProps: GetServerSideProps<
       description,
       isPreview: shouldUsePreviewApi,
       ssrDate: new Date().toISOString(),
-      showLoginToPreview: doesRequestPreview && !isAuthorized,
+      showLoginToPreview: isPreviewEnabled && !isAuthorized,
     },
   };
 };

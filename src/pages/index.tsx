@@ -11,13 +11,13 @@ const inter = Inter({ subsets: ["latin"] });
 
 interface HomeProps {
   productItems: ProductItem[];
-  isPreview?: boolean;
 }
 
-const Home: React.FC<HomeProps> = ({ productItems, isPreview }) => {
+const Home: React.FC<HomeProps> = ({ productItems }) => {
   const getProductUrl = (slug: string) => {
-    return `${paths.product}/${slug}${isPreview ? "?preview" : ""}`;
+    return `${paths.product}/${slug}`;
   };
+
   return (
     <>
       <Head>
@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
 
   res.setHeader("Cache-Control", "public, max-age=300");
 
-  return { props: { productItems, isPreview: shouldUsePreviewApi } };
+  return { props: { productItems } };
 };
 
 export default Home;

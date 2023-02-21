@@ -1,4 +1,4 @@
-import { MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
+import { IS_PREVIEW, MOCK_AUTHORIZATION_COOKIE_NAME } from "@/config";
 import { GetServerSidePropsContext, Redirect } from "next";
 import { fetchProductById, fetchProductBySku } from "./saleorApi";
 
@@ -33,18 +33,17 @@ export const getOptionsFromContext = ({
   const isMockAuthorizationCookiePresent =
     MOCK_AUTHORIZATION_COOKIE_NAME in req.cookies;
 
-  const isPreviewParameterPresent = "preview" in query;
+  const hasToWait = "wait" in query;
+  const isPreviewEnabled = isPreviewAllowed();
 
   const shouldUsePreviewApi =
-    isMockAuthorizationCookiePresent && isPreviewParameterPresent;
-
-  const hasToWait = "wait" in query;
+    isMockAuthorizationCookiePresent && isPreviewEnabled;
 
   return {
     isAuthorized: isMockAuthorizationCookiePresent,
-    doesRequestPreview: isPreviewParameterPresent,
-    shouldUsePreviewApi,
     hasToWait,
+    shouldUsePreviewApi,
+    isPreviewEnabled,
   } as const;
 };
 
@@ -100,3 +99,5 @@ export const getSaleorProductWithContentfulProductField: GetSaleorProduct =
 
     return null;
   };
+
+export const isPreviewAllowed = () => IS_PREVIEW;

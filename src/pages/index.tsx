@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
     return notFound();
   }
 
-  res.setHeader("Cache-Control", "public, max-age=300");
+  res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
 
   return { props: { productItems } };
 };

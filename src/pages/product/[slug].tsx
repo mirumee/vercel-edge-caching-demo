@@ -105,7 +105,7 @@ export const getServerSideProps: GetServerSideProps<
   const productTitle = associatedSaleorProduct?.name || title;
   const productImageUrl = associatedSaleorProduct?.imageUrl || imageUrl;
 
-  res.setHeader("Cache-Control", "public, max-age=300");
+  res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
 
   return {
     props: {

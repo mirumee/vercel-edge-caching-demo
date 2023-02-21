@@ -10,6 +10,7 @@ import {
   notFound,
   getOptionsFromContext,
   getSaleorProductWithContentfulProductField,
+  getCacheControlValue,
 } from "@/lib/ssrUtils";
 import { paths } from "@/paths";
 
@@ -78,8 +79,13 @@ export const getServerSideProps: GetServerSideProps<
     return redirectTo(paths.home);
   }
 
-  const { isAuthorized, hasToWait, shouldUsePreviewApi, isPreviewEnabled } =
-    getOptionsFromContext(context);
+  const {
+    isAuthorized,
+    hasToWait,
+    shouldUsePreviewApi,
+    isPreviewEnabled,
+    doesRequestPreview,
+  } = getOptionsFromContext(context);
 
   if (hasToWait) {
     await waitForFewSeconds();
@@ -105,7 +111,7 @@ export const getServerSideProps: GetServerSideProps<
   const productTitle = associatedSaleorProduct?.name || title;
   const productImageUrl = associatedSaleorProduct?.imageUrl || imageUrl;
 
-  res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
+  res.setHeader("Cache-Control", getCacheControlValue(doesRequestPreview));
 
   return {
     props: {

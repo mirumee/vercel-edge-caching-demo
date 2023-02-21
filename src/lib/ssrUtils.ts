@@ -34,6 +34,8 @@ export const getOptionsFromContext = ({
     MOCK_AUTHORIZATION_COOKIE_NAME in req.cookies;
 
   const hasToWait = "wait" in query;
+  const doesRequestPreview = "preview" in query;
+
   const isPreviewEnabled = isPreviewAllowed();
 
   const shouldUsePreviewApi =
@@ -44,6 +46,7 @@ export const getOptionsFromContext = ({
     hasToWait,
     shouldUsePreviewApi,
     isPreviewEnabled,
+    doesRequestPreview,
   } as const;
 };
 
@@ -101,3 +104,7 @@ export const getSaleorProductWithContentfulProductField: GetSaleorProduct =
   };
 
 export const isPreviewAllowed = () => IS_PREVIEW;
+
+export const getCacheControlValue = (noCache = false) => {
+  return noCache ? "public, max-age=300" : "no-store";
+};

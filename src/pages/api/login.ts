@@ -3,6 +3,7 @@ import {
   MOCK_AUTHORIZATION_COOKIE_NAME,
   VERCEL_NO_CACHE_COOKIE_NAME,
 } from "@/config";
+import { getCacheControlValue } from "@/lib/ssrUtils";
 
 const login: NextApiHandler = (req, res) => {
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -17,7 +18,7 @@ const login: NextApiHandler = (req, res) => {
   res
     .setHeader("Set-Cookie", [mockAuthorizationCookie, vercelNoCacheCookie])
     .setHeader("Access-Control-Expose-Headers", "Set-Cookie")
-    .setHeader("Cache-Control", "no-cache")
+    .setHeader("Cache-Control", getCacheControlValue(true))
     .status(200)
     .json({ login: "Successful" });
 };

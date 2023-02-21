@@ -2,7 +2,11 @@ import Head from "next/head";
 import { Inter } from "@next/font/google";
 import { GetServerSideProps } from "next";
 import { fetchAllProducts, ProductItem } from "@/lib/contentfulAPI";
-import { getOptionsFromContext, notFound } from "@/lib/ssrUtils";
+import {
+  getCacheControlValue,
+  getOptionsFromContext,
+  notFound,
+} from "@/lib/ssrUtils";
 import Link from "next/link";
 import { paths } from "@/paths";
 import { LoginButton } from "@/components/LoginButton";
@@ -42,7 +46,8 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   context
 ) => {
   const { res } = context;
-  const { shouldUsePreviewApi } = getOptionsFromContext(context);
+  const { shouldUsePreviewApi, doesRequestPreview } =
+    getOptionsFromContext(context);
 
   const productItems = await fetchAllProducts(shouldUsePreviewApi);
 
@@ -50,7 +55,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
     return notFound();
   }
 
-  res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
+  res.setHeader("Cache-Control", getCacheControlValue(doesRequestPreview));
 
   return { props: { productItems } };
 };
